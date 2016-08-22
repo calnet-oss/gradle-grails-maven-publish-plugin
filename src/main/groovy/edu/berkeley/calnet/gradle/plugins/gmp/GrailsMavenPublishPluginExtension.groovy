@@ -37,7 +37,7 @@ import org.gradle.api.publish.maven.MavenPom
  * <pre>{@code
  * buildscript {
  *     dependencies {
- *         classpath "org.grails:grails-gradle-plugin:2.2.0.RC2"
+ *         classpath "org.grails:grails-gradle-plugin:2.2.0.RC1"
  *         classpath "edu.berkeley.calnet.gradle.plugins:gradle-grails-maven-publish-plugin:[latestVersion]"
  *     }
  * }
@@ -61,7 +61,7 @@ import org.gradle.api.publish.maven.MavenPom
 // @formatter:on
 class GrailsMavenPublishPluginExtension {
     void addGrailsComponent(Project project) {
-        project.components.add(new GrailsLibrary(project.configurations))
+        project.components.add(new GrailsLibrary(project.name, project.configurations))
 
     }
 

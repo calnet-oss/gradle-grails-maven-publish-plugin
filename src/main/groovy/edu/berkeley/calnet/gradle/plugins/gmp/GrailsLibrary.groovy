@@ -84,8 +84,12 @@ class GrailsLibrary implements SoftwareComponentInternal {
      */
     private final LinkedHashSet<Usage> usages = new LinkedHashSet<Usage>()
     private final LinkedHashSet<Dependency> addedDependencies = new LinkedHashSet<Dependency>()
+    private final PublishArtifact artifact
 
-    public GrailsLibrary(ConfigurationContainer configurations) {
+    public GrailsLibrary(String projectName, ConfigurationContainer configurations) {
+        // the plugin package (zip file) artifact
+        this.artifact = configurations.getByName("runtime").allArtifacts.find { it.name == ("grails-${projectName}" as String) }
+        assert artifact
         ["compile", "runtime", "provided"].each { String scope ->
             usages.add(createUsage(scope, configurations.getByName(scope).allDependencies))
         }
@@ -97,10 +101,12 @@ class GrailsLibrary implements SoftwareComponentInternal {
         notAddedYet.removeAll { Dependency d ->
             excludeMap.containsKey("${d.group}:${d.name}" as String)
         }
+        // include the plugin zip file as a runtime artifact
+        final LinkedHashSet<PublishArtifact> artifacts = new LinkedHashSet<PublishArtifact>((name == "runtime" ? [artifact] : []))
         return new Usage() {
             String getName() { return name }
 
-            public Set<PublishArtifact> getArtifacts() { [] }
+            public Set<PublishArtifact> getArtifacts() { artifacts }
 
             public Set<Dependency> getDependencies() { notAddedYet }
         }
