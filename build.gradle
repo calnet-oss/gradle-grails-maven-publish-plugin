@@ -1,0 +1,112 @@
+/*
+ * Copyright (c) 2016, Regents of the University of California and
+ * contributors.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met:
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+ * IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+group 'edu.berkeley.calnet.gradle.plugins'
+version '0.1-SNAPSHOT'
+
+apply plugin: 'groovy'
+apply plugin: 'maven-publish'
+
+repositories {
+    mavenLocal()
+    // If using a Maven proxy, put the property settings in
+    // ~/.gradle/gradle.properties for default_proxy_url,
+    // default_proxy_username and default_proxy_password.
+    if (project.hasProperty("default_proxy_url")) {
+        maven {
+            url project.property("default_proxy_url")
+            credentials {
+                username project.property("default_proxy_username")
+                password project.property("default_proxy_password")
+            }
+        }
+    }
+    jcenter()
+    mavenCentral()
+}
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+}
+
+jar { from "LICENSE.txt", "NOTICE_THIRD_PARTY.txt" }
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allGroovy
+    from sourceSets.main.resources
+    from "LICENSE.txt", "NOTICE_THIRD_PARTY.txt"
+}
+
+task groovydocJar(type: Jar, dependsOn: groovydoc) {
+    from groovydoc.destinationDir
+    from "LICENSE.txt"
+}
+
+// publishing with './gradlew publish'
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+            artifact sourceJar { classifier "sources" }
+            artifact groovydocJar { classifier "javadoc" }
+            pom.withXml {
+                asNode().children().last() + {
+                    def githubWebUrl = "https://github.com/calnet-oss/gradle-grails-maven-publish-plugin"
+                    resolveStrategy = Closure.DELEGATE_FIRST
+                    name project.name
+                    description "Augment grails plugin to support maven-publish"
+                    url githubWebUrl
+                    scm {
+                        url githubWebUrl
+                        connection "scm:git:${githubWebUrl}.git"
+                        developerConnection "scm:git:${githubWebUrl}.git"
+                    }
+                    licenses {
+                        license {
+                            name 'BSD, Two-Clause'
+                            url 'https://github.com/calnet-oss/gradle-grails-maven-publish-plugin/LICENSE.txt'
+                            distribution 'repo'
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            // Put the property settings in ~/.gradle/gradle.properties for
+            // default_deploy_url, default_deploy_grails_plugin_repo
+            // default_deploy_username and default_deploy_password.
+            url "${project.property('default_deploy_url')}/${default_deploy_lib_repo}"
+            credentials {
+                username project.property("default_deploy_user")
+                password project.property("default_deploy_password")
+            }
+        }
+    }
+}
