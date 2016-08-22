@@ -10,7 +10,7 @@ This plugin does two things:
 * It sets the proper `scope` and `type` values in the generated Maven POM.
 
 Notes: 
-* We use this plugin with version `2.2.0.RC2` of the `grails-gradle-plugin`
+* We use this plugin with version `2.2.0.RC1` of the `grails-gradle-plugin`
   and Grails 2.5.  Usage with Grails 3 is untested.  We also tend to use
   this plugin for deploying Grails plugins (not applications) to Maven.
 * As of this writing, we use this plugin with Gradle 2.14.1.  Future
@@ -26,7 +26,7 @@ License is [BSD two-clause](LICENSE.txt).
 ```
 buildscript {
     dependencies {
-        classpath "org.grails:grails-gradle-plugin:2.2.0.RC2"
+        classpath "org.grails:grails-gradle-plugin:2.2.0.RC1"
         classpath "edu.berkeley.calnet.gradle.plugins:gradle-grails-maven-publish-plugin:[latestVersion]"
     }
 }
