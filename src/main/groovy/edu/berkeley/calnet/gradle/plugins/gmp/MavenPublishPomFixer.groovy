@@ -58,7 +58,6 @@ class MavenPublishPomFixer {
         pom.withXml {
             dependenciesParent((NodeList) asNode().get('dependencies'))
         }
-        pom.withXml { println it }
     }
 
     private void dependenciesParent(NodeList dependenciesParentList) {
