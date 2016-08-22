@@ -51,6 +51,23 @@ import org.gradle.api.internal.component.Usage
 // @formatter:on
 class GrailsLibrary implements SoftwareComponentInternal {
     /**
+     * These are core Grails dependencies added by the
+     * grails-gradle-plugin that shouldn't be in a Grails POM because these dependencies are naturally part of Grails.
+     * This is a bit messy because it's dependent on whatever version of grails-gradle-plugin is being used.
+     * We're assuming 2.2.0.
+     */
+    private static final Map<String, Boolean> excludeMap = [
+            "org.grails:grails-dependencies",
+            "org.grails:grails-core",
+            "org.grails:grails-bootstrap",
+            "org.codehaus.groovy:groovy-all",
+            "com.h2database:h2",
+            "javax.servlet:javax.servlet-api"
+    ].collectEntries {
+        [(it), true]
+    }
+
+    /**
      * See Gradle's JavaLibrary for example
      */
 
@@ -77,6 +94,9 @@ class GrailsLibrary implements SoftwareComponentInternal {
     private Usage createUsage(final String name, final DependencySet dependencies) {
         final Collection<Dependency> notAddedYet = dependencies - addedDependencies
         addedDependencies.addAll(notAddedYet)
+        notAddedYet.removeAll { Dependency d ->
+            excludeMap.containsKey("${d.group}:${d.name}" as String)
+        }
         return new Usage() {
             String getName() { return name }
 

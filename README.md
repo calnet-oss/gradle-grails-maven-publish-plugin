@@ -48,11 +48,3 @@ publishing {
     }
 }
 ```
-
-## Known issues
-
-* For Grails plugins, Grails core dependencies (and the groovy-all
-  dependency) will appear in the POM file.  `grails-gradle-plugin` adds
-  these core Grails dependencies.  This shouldn't be much of a problem
-  unless you're trying to use a Grails plugin configured for a later version
-  of Grails than your Grails application is actually using.
