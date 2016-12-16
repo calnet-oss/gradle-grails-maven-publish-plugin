@@ -58,6 +58,7 @@ import org.gradle.api.publish.maven.MavenPom
  *         }
  *         mavenJava(MavenPublication) {
  *             from components.java
+ *             grailsMavenPublish.fixPom(configurations, pom)
  *         }
  *     }
  * }

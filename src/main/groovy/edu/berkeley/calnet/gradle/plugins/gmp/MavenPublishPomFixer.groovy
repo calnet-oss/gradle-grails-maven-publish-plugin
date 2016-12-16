@@ -51,22 +51,53 @@ import org.gradle.api.publish.maven.MavenPom
  */
 // @formatter:on
 class MavenPublishPomFixer {
+    /**
+     * These are core Grails dependencies added by the
+     * grails-gradle-plugin that shouldn't be in a Grails POM because
+     * these dependencies are naturally part of Grails.  This is a bit
+     * messy because it's dependent on whatever version of
+     * grails-gradle-plugin is being used.  We're assuming 2.2.0.
+     */
+    private static final Map<String, Boolean> excludeMap = [
+            "org.grails:grails-dependencies",
+            "org.grails:grails-core",
+            "org.grails:grails-bootstrap",
+            "org.codehaus.groovy:groovy-all",
+            "com.h2database:h2",
+            "javax.servlet:javax.servlet-api"
+    ].collectEntries {
+        [(it), true]
+    }
+
     ConfigurationContainer configurations
     MavenPom pom
 
     void fixPom() {
         pom.withXml {
-            dependenciesParent((NodeList) asNode().get('dependencies'))
+            NodeList dependencies = (NodeList) asNode().get('dependencies')
+            if (dependencies.size() > 0) {
+                NodeList chldrn = dependencies.get(0).children()
+                removeGrailsDependencies(chldrn)
+                fixDependencies(chldrn)
+            }
         }
     }
 
-    private void dependenciesParent(NodeList dependenciesParentList) {
-        if (dependenciesParentList.size() > 0) {
-            dependencies(dependenciesParentList.get(0).children())
+    private void removeGrailsDependencies(NodeList dependenciesList) {
+        List<Node> nodesToRemove = []
+        dependenciesList.each { Node dependency ->
+            String groupId = dependency.get('groupId').text()
+            String artifactId = dependency.get('artifactId').text()
+            assert groupId
+            assert artifactId
+            if (excludeMap.containsKey("${groupId}:${artifactId}" as String)) {
+                nodesToRemove.add(dependency)
+            }
         }
+        dependenciesList.removeAll(nodesToRemove)
     }
 
-    private void dependencies(NodeList dependenciesList) {
+    private void fixDependencies(NodeList dependenciesList) {
         dependenciesList.each { Node dependency ->
             String groupId = dependency.get('groupId').text()
             String artifactId = dependency.get('artifactId').text()

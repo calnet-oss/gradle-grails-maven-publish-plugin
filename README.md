@@ -71,6 +71,7 @@ publishing {
         // jar and sources
         mavenJava(MavenPublication) {
             from components.java
+            grailsMavenPublish.fixPom(configurations, pom)
             artifact sourceJar { classifier "sources" }
         }
     }
