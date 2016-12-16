@@ -45,14 +45,19 @@ import org.gradle.api.publish.maven.MavenPom
  * apply plugin: 'edu.berkeley.calnet.grails-maven-publish'
  * apply plugin: 'maven-publish'
  *
+ * grailsMavenPublish.addJavaComponent(project)
+ *
  * publish.dependsOn assemble
  * publishToMavenLocal.dependsOn assemble
  * publishing {
  *     publications {
- *         maven(MavenPublication) {
+ *         mavenGrails(MavenPublication) {
  *             grailsMavenPublish.addGrailsComponent(project)
  *             from components.grails
  *             grailsMavenPublish.fixPom(configurations, pom)
+ *         }
+ *         mavenJava(MavenPublication) {
+ *             from components.java
  *         }
  *     }
  * }
@@ -62,7 +67,10 @@ import org.gradle.api.publish.maven.MavenPom
 class GrailsMavenPublishPluginExtension {
     void addGrailsComponent(Project project) {
         project.components.add(new GrailsLibrary(project.name, project.configurations))
+    }
 
+    void addJavaComponent(Project project) {
+        JavaLibraryAdder.addJavaLibrary(project)
     }
 
     void fixPom(ConfigurationContainer configurations, MavenPom pom) {

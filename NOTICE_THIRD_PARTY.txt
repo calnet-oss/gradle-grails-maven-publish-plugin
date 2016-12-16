@@ -13,5 +13,6 @@ Files that are covered by this license (may not be an exhaustive list):
     Everything in gradle subdirectory
     gradlew
     gradlew.bat
+    src/main/groovy/edu/berkeley/calnet/gradle/plugins/gmp/JavaLibraryAdder.groovy
 
 Gradle source code is available for download at http://gradle.org/.
